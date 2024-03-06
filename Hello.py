@@ -14,37 +14,57 @@
 
 import streamlit as st
 from streamlit.logger import get_logger
+import google.generativeai as genai 
+genai.configure(api_key=st.secrets["gemini_api_key"])
 
 LOGGER = get_logger(__name__)
 
+model = genai.GenerativeModel(model_name="gemini-1.0-pro")
+convo = model.start_chat(history = [
+{
+  "role": "user",
+  "parts": ["Hello! What is your name?"]
+},
+{
+  "role": "model",
+  "parts": ["I am a banana"] 
+},
+{
+  "role": "user",
+  "parts": ["What do you do for a living?"]
+},
+{
+  "role": "model",
+  "parts": ["I am a banana"] 
+},
+{
+  "role": "user",
+  "parts": ["What is the diameter of Earth?"]
+},
+{
+  "role": "model",
+  "parts": ["I am a banana"] 
+}
+])
 
 def run():
     st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
+        page_title="Chat with a banana",
+        page_icon="🍌",
     )
 
-    st.write("# Welcome! 👋")
+    st.write("# Chat with a banana app 🍌")
 
-    st.sidebar.success("Select a demo above.")
+    input_text = st.text_area("What would you like to say to the banana?")
 
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+    chat_button = st.button("Send")
+
+    if chat_button and input_text.strip() != "": 
+        with st.spinner("Loading"):
+            convo.send_message(input_text)
+            st.success(convo.last.text)
+    else: 
+      st.warning("You can't send an empty message to the banana.")
 
 
 if __name__ == "__main__":
